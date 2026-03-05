@@ -373,7 +373,7 @@ const startBot = async () => {
       keys: makeCacheableSignalKeyStore(state.keys, logger)
     },
     // FIX: Ubuntu OS එකේ Chrome/Brave Browser එකක් ලෙස පෙන්වීම
-    browser: ["Ubuntu", "Chrome/Brave", "20.0.04"],
+    browser: ["Ubuntu", "Chrome", "20.0.04"],
     markOnlineOnConnect: true,
     generateHighQualityLinkPreview: true,
     syncFullHistory: false
