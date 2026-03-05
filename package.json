@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "Nexa WhatsApp Bot - Powered by Baileys",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
@@ -11,6 +12,7 @@
     "@whiskeysockets/baileys": "^6.7.9",
     "axios": "^1.7.2",
     "express": "^4.19.2",
+    "cors": "^2.8.5",
     "pino": "^9.3.2",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
