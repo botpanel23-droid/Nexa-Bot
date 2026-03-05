@@ -1,5 +1,9 @@
-import './src/keepalive.js';
-import makeWASocket, {
+import './src/keepalive.js'
+
+import baileys from '@whiskeysockets/baileys'
+
+const {
+  default: makeWASocket,
   useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion,
@@ -10,19 +14,20 @@ import makeWASocket, {
   makeInMemoryStore,
   jidDecode,
   getContentType
-} from '@whiskeysockets/baileys';
-import pino from 'pino';
-import express from 'express';
-import cors from 'cors';
-import qrcode from 'qrcode';
-import fs from 'fs-extra';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { createRequire } from 'module';
+} = baileys
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const require = createRequire(import.meta.url);
+import pino from 'pino'
+import express from 'express'
+import cors from 'cors'
+import qrcode from 'qrcode'
+import fs from 'fs-extra'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { createRequire } from 'module'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const require = createRequire(import.meta.url)
 
 // ═══════════════════════════════════════════
 //           NEXA BOT - CORE SYSTEM
