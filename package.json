@@ -17,6 +17,7 @@
     "qrcode-terminal": "^0.12.0",
     "node-cron": "^3.0.3",
     "fs-extra": "^11.2.0",
+    "cors": "^2.8.5",
     "sharp": "^0.33.4"
   },
   "engines": {
