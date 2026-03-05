@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexa Bot - Control Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon: #00f5ff;
+    --neon2: #7b2fff;
+    --neon3: #ff2d78;
+    --bg: #030712;
+    --bg2: #0a0f1e;
+    --bg3: #0d1529;
+    --card: rgba(10,20,50,0.85);
+    --border: rgba(0,245,255,0.15);
+    --text: #c8d8f0;
+    --success: #00ff88;
+    --warn: #ffb800;
+    --danger: #ff2d78;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 80% at 10% 10%, rgba(123,47,255,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 60% at 90% 90%, rgba(0,245,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,45,120,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    position: relative;
+  }
+
+  .bot-logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px solid var(--neon);
+    box-shadow: 0 0 30px rgba(0,245,255,0.4), 0 0 60px rgba(0,245,255,0.15);
+    animation: pulse-logo 3s ease-in-out infinite;
+    margin-bottom: 15px;
+  }
+
+  @keyframes pulse-logo {
+    0%,100% { box-shadow: 0 0 30px rgba(0,245,255,0.4), 0 0 60px rgba(0,245,255,0.15); }
+    50% { box-shadow: 0 0 50px rgba(0,245,255,0.7), 0 0 100px rgba(0,245,255,0.3); }
+  }
+
+  .bot-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--neon), var(--neon2), var(--neon3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 4px;
+    animation: shimmer 3s linear infinite;
+    background-size: 200% auto;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+
+  .bot-sub {
+    font-size: 1rem;
+    color: rgba(200,216,240,0.5);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+
+  /* Status Badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 15px;
+    border: 1px solid;
+    transition: all 0.3s;
+  }
+  .status-badge.connected { background: rgba(0,255,136,0.1); border-color: var(--success); color: var(--success); }
+  .status-badge.disconnected { background: rgba(255,45,120,0.1); border-color: var(--danger); color: var(--danger); }
+  .status-badge.waiting { background: rgba(255,184,0,0.1); border-color: var(--warn); color: var(--warn); }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    animation: blink 1.2s ease-in-out infinite;
+  }
+  .connected .status-dot { background: var(--success); }
+  .disconnected .status-dot { background: var(--danger); }
+  .waiting .status-dot { background: var(--warn); }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon), transparent);
+    opacity: 0.5;
+  }
+
+  .card:hover { border-color: rgba(0,245,255,0.3); }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--neon);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+  }
+
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.4);
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    border-radius: 9px;
+    color: rgba(200,216,240,0.5);
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, rgba(0,245,255,0.15), rgba(123,47,255,0.15));
+    color: var(--neon);
+    border: 1px solid rgba(0,245,255,0.3);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* QR Section */
+  .qr-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .qr-box {
+    width: 240px;
+    height: 240px;
+    background: white;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    box-shadow: 0 0 40px rgba(0,245,255,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .qr-box img { width: 100%; height: 100%; border-radius: 8px; }
+
+  .qr-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #333;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+  }
+
+  .qr-scan-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00f5ff, transparent);
+    animation: scan 2s linear infinite;
+    opacity: 0.7;
+  }
+
+  @keyframes scan {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
+
+  /* Pair Code Box */
+  .pair-code-box {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,245,255,0.3);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .pair-code {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--neon);
+    letter-spacing: 6px;
+    text-shadow: 0 0 20px rgba(0,245,255,0.5);
+  }
+
+  .pair-code-label {
+    font-size: 0.8rem;
+    color: rgba(200,216,240,0.5);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* Inputs */
+  .input-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  input[type="text"], input[type="tel"] {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 18px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus { border-color: var(--neon); box-shadow: 0 0 0 2px rgba(0,245,255,0.1); }
+
+  /* Buttons */
+  .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--neon2), var(--neon));
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0,245,255,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0,245,255,0.4); }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ff2d78, #ff6b35);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(255,45,120,0.25);
+  }
+  .btn-danger:hover { transform: translateY(-2px); }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover { border-color: var(--neon); color: var(--neon); }
+
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Copy button */
+  .copy-btn {
+    padding: 8px 16px;
+    background: rgba(0,245,255,0.1);
+    border: 1px solid rgba(0,245,255,0.3);
+    border-radius: 8px;
+    color: var(--neon);
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    margin-top: 10px;
+  }
+  .copy-btn:hover { background: rgba(0,245,255,0.2); }
+
+  /* Settings Grid */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+
+  .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.2s;
+  }
+  .setting-item:hover { border-color: rgba(0,245,255,0.25); }
+
+  .setting-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Toggle Switch */
+  .toggle {
+    position: relative;
+    width: 46px;
+    height: 24px;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .toggle-slider:before {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    left: 3px; top: 3px;
+    background: rgba(200,216,240,0.5);
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+  input:checked + .toggle-slider { background: rgba(0,245,255,0.15); border-color: var(--neon); }
+  input:checked + .toggle-slider:before { transform: translateX(22px); background: var(--neon); box-shadow: 0 0 8px rgba(0,245,255,0.5); }
+
+  /* Select */
+  select {
+    padding: 8px 14px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+  }
+  select:focus { border-color: var(--neon); }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(10,20,50,0.95);
+    border: 1px solid var(--neon);
+    color: var(--neon);
+    padding: 12px 28px;
+    border-radius: 40px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    z-index: 9999;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 40px rgba(0,245,255,0.2);
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Info boxes */
+  .info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { color: rgba(200,216,240,0.5); }
+  .info-val { font-weight: 700; color: var(--neon); }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 30px;
+    color: rgba(200,216,240,0.2);
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+  }
+
+  .neon-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon), var(--neon2), var(--neon3), transparent);
+    margin: 20px 0;
+    opacity: 0.3;
+  }
+
+  @media (max-width: 600px) {
+    .bot-title { font-size: 2rem; }
+    .tab-btn { font-size: 0.8rem; padding: 8px 4px; }
+    .settings-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <img src="https://files.catbox.moe/1zj41k.png" alt="Nexa Bot Logo" class="bot-logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%230a0f1e%22/><text y=%22.9em%22 font-size=%2260%22 x=%2210%22>🤖</text></svg>'">
+    <div class="bot-title">NEXA BOT</div>
+    <div class="bot-sub">Advanced WhatsApp Bot v1.0</div>
+    <div id="statusBadge" class="status-badge disconnected">
+      <span class="status-dot"></span>
+      <span id="statusText">Connecting...</span>
+    </div>
+  </header>
+
+  <div class="neon-line"></div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('connect')">🔗 Connect</button>
+    <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+    <button class="tab-btn" onclick="switchTab('info')">📊 Info</button>
+  </div>
+
+  <!-- Connect Tab -->
+  <div id="tab-connect" class="tab-content active">
+    <div class="card">
+      <div class="card-title">📱 QR Code Connection</div>
+      <div class="qr-wrapper">
+        <div class="qr-box" id="qrBox">
+          <div class="qr-scan-line" id="scanLine"></div>
+          <div class="qr-placeholder" id="qrPlaceholder">
+            <span style="font-size:3rem">⏳</span>
+            <span>Generating QR...</span>
+          </div>
+          <img id="qrImage" style="display:none" alt="QR Code">
+        </div>
+        <p style="color:rgba(200,216,240,0.4); font-size:0.9rem; text-align:center;">
+          Open WhatsApp → Linked Devices → Link a Device
+        </p>
+        <button class="btn btn-outline" onclick="refreshQR()">🔄 Refresh QR</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔑 Pair Code Connection</div>
+      <p style="color:rgba(200,216,240,0.5); font-size:0.9rem; margin-bottom:16px;">
+        Enter your WhatsApp number to get a Pair Code (easier than QR!)
+      </p>
+      <div class="input-group">
+        <input type="tel" id="phoneInput" placeholder="e.g. 94771234567" maxlength="15">
+        <button class="btn btn-primary" onclick="getPairCode()" id="pairBtn">Get Code</button>
+      </div>
+
+      <div id="pairCodeBox" class="pair-code-box" style="display:none; margin-top:16px;">
+        <div class="pair-code-label">Your Pair Code</div>
+        <div class="pair-code" id="pairCodeDisplay">----</div>
+        <p style="color:rgba(200,216,240,0.4); font-size:0.8rem; margin-top:8px;">
+          Enter this code in WhatsApp → Linked Devices → Link with phone number
+        </p>
+        <button class="copy-btn" onclick="copyPairCode()">📋 Copy Code</button>
+      </div>
+    </div>
+
+    <div class="card" id="connectedCard" style="display:none;">
+      <div class="card-title">✅ Bot Connected</div>
+      <p style="margin-bottom:16px; color:rgba(200,216,240,0.6);">Your Nexa Bot is online and ready!</p>
+      <button class="btn btn-danger" onclick="logoutBot()">🚪 Logout Bot</button>
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div id="tab-settings" class="tab-content">
+    <div class="card">
+      <div class="card-title">🌐 Bot Mode</div>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <span class="setting-label">🌐 Bot Mode</span>
+          <select id="botMode" onchange="updateSetting('botMode', this.value)">
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">👥 Work in Groups</span>
+          <label class="toggle">
+            <input type="checkbox" id="workGroup" onchange="updateWorkMode('group', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">📩 Work in Inbox</span>
+          <label class="toggle">
+            <input type="checkbox" id="workInbox" onchange="updateWorkMode('inbox', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">🔒 Work in Private</span>
+          <label class="toggle">
+            <input type="checkbox" id="workPrivate" onchange="updateWorkMode('private', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔧 Auto Features</div>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <span class="setting-label">📖 Auto Read</span>
+          <label class="toggle">
+            <input type="checkbox" id="autoRead" onchange="updateSetting('autoRead', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">⌨️ Auto Typing</span>
+          <label class="toggle">
+            <input type="checkbox" id="autoTyping" onchange="updateSetting('autoTyping', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">💬 Auto Reply</span>
+          <label class="toggle">
+            <input type="checkbox" id="autoReply" onchange="updateSetting('autoReply', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">🛡️ Anti Delete</span>
+          <label class="toggle">
+            <input type="checkbox" id="antiDelete" onchange="updateSetting('antiDelete', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">🔗 Anti Link</span>
+          <label class="toggle">
+            <input type="checkbox" id="antiLink" onchange="updateSetting('antiLink', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">🚫 Anti Spam</span>
+          <label class="toggle">
+            <input type="checkbox" id="antiSpam" onchange="updateSetting('antiSpam', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">👋 Welcome Msg</span>
+          <label class="toggle">
+            <input type="checkbox" id="welcomeMessage" onchange="updateSetting('welcomeMessage', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">👋 Goodbye Msg</span>
+          <label class="toggle">
+            <input type="checkbox" id="goodbyeMessage" onchange="updateSetting('goodbyeMessage', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Tab -->
+  <div id="tab-info" class="tab-content">
+    <div class="card">
+      <div class="card-title">📊 Bot Information</div>
+      <div id="infoContent">
+        <div class="info-row"><span class="info-key">Bot Name</span><span class="info-val" id="infoName">-</span></div>
+        <div class="info-row"><span class="info-key">Version</span><span class="info-val" id="infoVersion">-</span></div>
+        <div class="info-row"><span class="info-key">Status</span><span class="info-val" id="infoStatus">-</span></div>
+        <div class="info-row"><span class="info-key">Prefix</span><span class="info-val" id="infoPrefix">-</span></div>
+        <div class="info-row"><span class="info-key">Mode</span><span class="info-val" id="infoMode">-</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Quick Commands</div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:8px;">
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.menu</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.ping</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.info</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.settings</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.tagall</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.quote</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.joke</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.calc</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.flip</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.warn @</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.kick @</div>
+        <div style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">.promote @</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    ⚡ NEXA BOT — Advanced WhatsApp Automation<br>
+    Powered by Baileys · Built with ❤️
+  </footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let currentSettings = {};
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'settings') loadSettings();
+  if (tab === 'info') loadInfo();
+}
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = isError ? 'var(--danger)' : 'var(--neon)';
+  t.style.color = isError ? 'var(--danger)' : 'var(--neon)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function checkStatus() {
+  try {
+    const res = await fetch('/api/status');
+    const data = await res.json();
+    const badge = document.getElementById('statusBadge');
+    const statusText = document.getElementById('statusText');
+    const connCard = document.getElementById('connectedCard');
+
+    if (data.connected) {
+      badge.className = 'status-badge connected';
+      statusText.textContent = 'Connected ✅';
+      connCard.style.display = 'block';
+      document.getElementById('qrBox').style.opacity = '0.3';
+    } else if (data.hasQR) {
+      badge.className = 'status-badge waiting';
+      statusText.textContent = 'Scan QR Code';
+      loadQR();
+    } else {
+      badge.className = 'status-badge disconnected';
+      statusText.textContent = 'Connecting...';
+    }
+  } catch(e) {}
+}
+
+async function loadQR() {
+  try {
+    const res = await fetch('/api/qr');
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('qrImage').src = data.qr;
+      document.getElementById('qrImage').style.display = 'block';
+      document.getElementById('qrPlaceholder').style.display = 'none';
+    }
+  } catch(e) {}
+}
+
+async function refreshQR() {
+  document.getElementById('qrPlaceholder').style.display = 'flex';
+  document.getElementById('qrImage').style.display = 'none';
+  showToast('⏳ Refreshing QR...');
+  await loadQR();
+}
+
+async function getPairCode() {
+  const phone = document.getElementById('phoneInput').value.trim();
+  if (!phone) return showToast('❌ Enter phone number!', true);
+  
+  const btn = document.getElementById('pairBtn');
+  btn.disabled = true;
+  btn.textContent = 'Getting...';
+  
+  try {
+    const res = await fetch('/api/pair', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      document.getElementById('pairCodeDisplay').textContent = data.code;
+      document.getElementById('pairCodeBox').style.display = 'block';
+      showToast('✅ Pair code generated!');
+    } else {
+      showToast('❌ ' + data.message, true);
+    }
+  } catch(e) {
+    showToast('❌ Server error', true);
+  }
+  
+  btn.disabled = false;
+  btn.textContent = 'Get Code';
+}
+
+function copyPairCode() {
+  const code = document.getElementById('pairCodeDisplay').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('📋 Pair code copied!');
+  }).catch(() => {
+    // fallback
+    const el = document.createElement('textarea');
+    el.value = code;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('📋 Pair code copied!');
+  });
+}
+
+async function logoutBot() {
+  if (!confirm('Logout bot?')) return;
+  const res = await fetch('/api/logout', { method: 'POST' });
+  const data = await res.json();
+  showToast(data.message);
+  location.reload();
+}
+
+async function loadSettings() {
+  try {
+    const res = await fetch('/api/settings');
+    const data = await res.json();
+    if (!data.success) return;
+    const s = data.settings;
+    currentSettings = s;
+
+    document.getElementById('botMode').value = s.botMode || 'public';
+    document.getElementById('workGroup').checked = s.workMode?.group !== false;
+    document.getElementById('workInbox').checked = s.workMode?.inbox !== false;
+    document.getElementById('workPrivate').checked = s.workMode?.private !== false;
+    document.getElementById('autoRead').checked = s.autoRead !== false;
+    document.getElementById('autoTyping').checked = s.autoTyping !== false;
+    document.getElementById('autoReply').checked = !!s.autoReply;
+    document.getElementById('antiDelete').checked = !!s.antiDelete;
+    document.getElementById('antiLink').checked = !!s.antiLink;
+    document.getElementById('antiSpam').checked = !!s.antiSpam;
+    document.getElementById('welcomeMessage').checked = s.welcomeMessage !== false;
+    document.getElementById('goodbyeMessage').checked = s.goodbyeMessage !== false;
+  } catch(e) {}
+}
+
+async function updateSetting(key, value) {
+  try {
+    const payload = {};
+    payload[key] = value;
+    const res = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) showToast('✅ Setting saved!');
+    else showToast('❌ Failed to save', true);
+  } catch(e) {
+    showToast('❌ Error', true);
+  }
+}
+
+async function updateWorkMode(mode, value) {
+  try {
+    const res = await fetch('/api/settings');
+    const data = await res.json();
+    const workMode = data.settings.workMode || {};
+    workMode[mode] = value;
+    await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workMode })
+    });
+    showToast(`✅ Work mode updated!`);
+  } catch(e) {}
+}
+
+async function loadInfo() {
+  try {
+    const res = await fetch('/api/status');
+    const data = await res.json();
+    document.getElementById('infoName').textContent = data.botName || '-';
+    document.getElementById('infoVersion').textContent = data.version || '-';
+    document.getElementById('infoStatus').textContent = data.connected ? '🟢 Online' : '🔴 Offline';
+    
+    const sRes = await fetch('/api/settings');
+    const sData = await sRes.json();
+    if (sData.success) {
+      document.getElementById('infoPrefix').textContent = sData.settings.prefix || '.';
+      document.getElementById('infoMode').textContent = sData.settings.botMode || 'public';
+    }
+  } catch(e) {}
+}
+
+// Auto refresh
+setInterval(checkStatus, 4000);
+checkStatus();
+loadQR();
+</script>
+</body>
+</html>
