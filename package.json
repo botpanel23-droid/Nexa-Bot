@@ -1,0 +1,24 @@
+{
+  "name": "nexa-bot",
+  "version": "1.0.0",
+  "description": "Nexa Bot - WhatsApp Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.5",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "pino": "^8.17.0",
+    "qrcode": "^1.5.3",
+    "fs-extra": "^11.2.0",
+    "axios": "^1.6.0",
+    "body-parser": "^1.20.2"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "author": "Nexa Bot",
+  "license": "MIT"
+}
