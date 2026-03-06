@@ -906,8 +906,6 @@ app.listen(PORT, () => {
 //           START WHATSAPP BOT
 // ═══════════════════════════════════════════
 
-async function startBot() {
-
   const { state, saveCreds } = await useMultiFileAuthState('./auth_info_baileys');
   const { version } = await fetchLatestBaileysVersion();
 
