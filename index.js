@@ -900,12 +900,7 @@ app.listen(PORT, () => {
 🌐 Web Panel: http://localhost:${PORT}
 📱 Scan QR or use Pair Code
 ━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  startBot();
-});
-// ═══════════════════════════════════════════
-//           START WHATSAPP BOT
-// ═══════════════════════════════════════════
-
+  
   const { state, saveCreds } = await useMultiFileAuthState('./auth_info_baileys');
   const { version } = await fetchLatestBaileysVersion();
 
