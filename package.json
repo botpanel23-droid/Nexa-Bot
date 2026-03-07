@@ -1,19 +1,28 @@
 {
   "name": "nexa-bot",
-  "version": "1.0.0",
-  "description": "Nexa Bot - WhatsApp Bot",
+  "version": "2.0.0",
+  "description": "Nexa Bot - WhatsApp Multi-Bot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.5",
-    "cors": "^2.8.5",
+    "@whiskeysockets/baileys": "npm:baileys-mod",
     "express": "^4.18.2",
-    "pino": "^8.17.0",
-    "qrcode": "^1.5.3",
     "fs-extra": "^11.2.0",
+    "pino": "^8.21.0",
+    "jimp": "^0.16.1",
+    "form-data": "^4.0.0",
+    "cheerio": "^1.0.0",
+    "ruhend-scraper": "9.0.1",
+    "yt-search": "2.12.1",
+    "node-fetch": "3.3.2",
     "axios": "^1.6.0",
+    "qrcode": "^1.5.3",
+    "moment-timezone": "^0.5.45",
+    "denethdev-ytmp3": "1.0.3",
+    "sharp": "^0.33.0",
+    "@octokit/rest": "^20.0.2",
     "body-parser": "^1.20.2"
   },
   "engines": {
